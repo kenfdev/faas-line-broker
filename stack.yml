@@ -1,0 +1,16 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  line-broker-function:
+    lang: go
+    handler: ./line-broker-function
+    image: kenfdev/go-line-broker-function
+    environment_file:
+      - './.env.yaml'
+
+  dummy-df-broker-function:
+    lang: node
+    handler: ./dummy-df-broker-function
+    image: kenfdev/dummy-df-broker-function
