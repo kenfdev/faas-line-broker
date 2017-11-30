@@ -3,10 +3,10 @@ package function
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 )
 
 type LineMessage struct {
@@ -31,9 +31,7 @@ type DialogFlowResponse struct {
 }
 
 // Handle a serverless request
-func Handle(req []byte) {
-	// immediate response
-	fmt.Println("OK")
+func Handle(req []byte, wg *sync.WaitGroup) string {
 
 	var webhookReq LineWebhookRequest
 	err := json.Unmarshal(req, &webhookReq)
@@ -41,9 +39,14 @@ func Handle(req []byte) {
 		panic(err)
 	}
 
-	handleLineRequest(webhookReq)
+	wg.Add(1)
+	go func() {
+		handleLineRequest(webhookReq)
+		wg.Done()
+	}()
 
-	return
+	// immediate response
+	return "OK"
 }
 
 func postDialogFlow(text string) DialogFlowResponse {
